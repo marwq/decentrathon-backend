@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     # Pinecone
     PINECONE_API_KEY: str
     PINECONE_ENVIRONMENT: str
+    
+    # TG
+    TELEGRAM_BOT_TOKEN: str
 
 
 settings = Settings()

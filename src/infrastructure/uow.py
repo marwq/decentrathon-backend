@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.infrastructure.repositories import (
     UserRepo,
-    ChatRepo,
+    ApplicantRepo,
 )
 
 
@@ -24,7 +24,7 @@ class SQLAlchemyUoW:
     """
 
     user_repo: UserRepo
-    chat_repo: ChatRepo
+    applicant_repo: ApplicantRepo
 
     def __init__(self, session_factory: async_sessionmaker[AsyncSession]) -> None:
         """
@@ -56,7 +56,7 @@ class SQLAlchemyUoW:
             return self
         self.session = self.session_factory()
         self.user_repo = UserRepo(self.session)
-        self.chat_repo = ChatRepo(self.session)
+        self.applicant_repo = ApplicantRepo(self.session)
         return self
 
     async def __aexit__(self, *args) -> None:

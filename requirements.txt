@@ -10,3 +10,4 @@ pyjwt
 loguru
 asyncpg
 psycopg2
+aiogram

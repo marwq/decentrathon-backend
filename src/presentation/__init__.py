@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 
-from src.presentation.routers.chat import router as chat_router
-from src.presentation.routers.search import router as search_router
+from src.presentation.routers.auth import router as auth_router
+from src.presentation.routers.applicant import router as applicant_router
 
 routers = [
-    chat_router,
-    search_router,
+    auth_router,
+    applicant_router,
 ]
 
 
