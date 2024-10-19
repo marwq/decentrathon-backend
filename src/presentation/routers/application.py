@@ -7,10 +7,12 @@ from starlette.concurrency import run_in_threadpool
 from pydantic import UUID4
 from loguru import logger
 
+from src.application.notifier.services import send_notification_to_queue
 from src.infrastructure.uow import SQLAlchemyUoW
 from src.infrastructure.models import Application
 from src.presentation.di import get_user_id, get_uow
 from ..schemas.application import ApplicationWithJobResponse, NewApplicationSchema
+from config import settings
 
 
 router = APIRouter(prefix="/applications", tags=["applications"])
@@ -43,5 +45,10 @@ async def add_new_application(
         uow.session.add(application)
         await uow.session.commit()
         await uow.session.refresh(application)
-            
+    text = f"Новый отклик на вакансию {application.job.title}"
+    miniapp_btn_text = "Посмотреть"
+    miniapp_btn_url = settings.MINIAPP_BASE_URL + "/application/" + str(application.id)
+    await send_notification_to_queue(
+        application.applicant_id, text, miniapp_btn_url, miniapp_btn_text
+    )
     return application.as_dict_up()

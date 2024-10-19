@@ -6,6 +6,7 @@ load_dotenv()
 
 class Settings(BaseSettings):
     APP_PORT: int
+    MINIAPP_BASE_URL: str
 
     # Postgres
     DB_HOST: str

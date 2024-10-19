@@ -68,4 +68,3 @@ async def get_user_id(
     if user_id is None:
         raise HTTPException(401, "user_id is None")
     return int(user_id)
-

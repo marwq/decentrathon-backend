@@ -32,3 +32,14 @@ services:
       - redis
     env_file:
       - .docker.env
+
+  notifier:
+    build: .
+    command: python3 -m src.presentation.notifier.main
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .docker.env

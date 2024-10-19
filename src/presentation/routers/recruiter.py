@@ -11,6 +11,7 @@ from pydantic import UUID4
 from loguru import logger
 
 from src.application.application.enums import ApplicationStatus
+from src.application.notifier.services import send_notification_to_queue
 from src.infrastructure.uow import SQLAlchemyUoW
 from src.presentation.di import get_uow, get_user_id
 from ..schemas.recruiter import (
@@ -85,4 +86,15 @@ async def handle_application(
             raise HTTPException(403, "Not yours")
         application.status = schema.status
         await uow.session.commit()
+    
+    if schema.status == ApplicationStatus.INVITED:
+        text = f"Ты <b>приглашен</b> в компанию <b>{application.job.owner.company_name}</b>!"
+    elif schema.status == ApplicationStatus.REJECTED:
+        text = f"К сожалению, компания <b>{application.job.owner.company_name} не рассматривает на данный момент</b>"
+    miniapp_btn_text = "Посмотреть"
+    miniapp_btn_url = settings.MINIAPP_BASE_URL + "/application/" + str(application.id)
+    await send_notification_to_queue(
+        application.applicant_id, text, miniapp_btn_url, miniapp_btn_text
+    )
+    
     return application.as_dict_down()
