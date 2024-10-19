@@ -3,6 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel, UUID4
 
 from src.application.job.enums import WorkType, EmploymentType
+from src.application.application.enums import ApplicationStatus
 from .user import UserResponse
 
 
@@ -26,4 +27,8 @@ class SetRecruiterSchema(BaseModel):
 
 class RecruiterWithJobsResponse(UserRecruiterResposne):
     jobs: list[JobResponse]
+    
+class HandleApplicationSchema(BaseModel):
+    application_id: UUID4
+    status: ApplicationStatus
 

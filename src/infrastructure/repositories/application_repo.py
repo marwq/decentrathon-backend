@@ -15,4 +15,3 @@ class ApplicationRepo(SQLAlchemyRepo[Application]):
     
     model = Application
     
-    
