@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 from typing import Sequence
 
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from sqlalchemy.dialects.postgresql import insert
 
 from src.infrastructure.models.recruiter import UserRecruiter
@@ -26,5 +27,17 @@ class RecruiterRepo(SQLAlchemyRepo[UserRecruiter]):
         )
         result = await self._session.execute(stmt)
         return result.unique().scalar_one()
+    
+    async def get_recruiter_with_jobs(
+        self,
+        user_id: int,
+    ) -> UserRecruiter | None:
+        stmt = (
+            select(UserRecruiter)
+            .options(joinedload(UserRecruiter.jobs))
+            .where(UserRecruiter.user_id == user_id)
+        )
+        resp = await self._session.execute(stmt)
+        return resp.unique().scalar_one_or_none()
     
     

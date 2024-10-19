@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 from typing import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload
 from sqlalchemy.dialects.postgresql import insert
 
@@ -60,6 +60,26 @@ class JobRepo(SQLAlchemyRepo[Job]):
             stmt = stmt.where(Job.employment_type == employment_type)
         resp = await self._session.execute(stmt)
         return resp.scalars().all()
+    
+    async def count_jobs(
+        self,
+        q: str | None = None,
+        work_type: WorkType | None = None,
+        employment_type: EmploymentType | None = None,
+    ) -> int:
+        stmt = select(func.count(Job.id))
+
+        if q is not None:
+            stmt = stmt.where(
+                Job.title.ilike(f"%{q}%") | Job.details.ilike(f"%{q}%")
+            )
+        if work_type is not None:
+            stmt = stmt.where(Job.work_type == work_type)
+        if employment_type is not None:
+            stmt = stmt.where(Job.employment_type == employment_type)
+        
+        resp = await self._session.execute(stmt)
+        return resp.scalar()
 
     async def get_job_with_owner(self, id: str) -> Job | None:
         stmt = (

@@ -47,4 +47,6 @@ async def get_my_jobs(
     user_id: Annotated[int, Depends(get_user_id)],
     uow: Annotated[SQLAlchemyUoW, Depends(get_uow)],
 ) -> RecruiterWithJobsResponse:
-    ...
+    async with uow:
+        user_recruiter = await uow.recruiter_repo.get_recruiter_with_jobs(user_id)
+    return user_recruiter.as_dict_both()

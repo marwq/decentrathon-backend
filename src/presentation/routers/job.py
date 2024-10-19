@@ -33,7 +33,7 @@ async def get_jobs_list(
         user = await uow.user_repo.get_item_by_id(user_id)
         jobs_list = await uow.job_repo.get_jobs(skip, limit, q, work_type, employment_type)
         jobs = [i.as_dict_up() | {"relevance": get_job_relevance(user.applicant, i)} for i in jobs_list]
-        count = await get_jobs_count(uow)
+        count = await get_jobs_count(uow, q=q, work_type=work_type, employment_type=employment_type)
         
     return JobsReponse(
         count=count,

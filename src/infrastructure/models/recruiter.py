@@ -28,7 +28,15 @@ class UserRecruiter(Base):
         )
         
     def as_dict_down(self):
+        try:
+            jobs = [i.as_dict_down() for i in self.jobs]
+        except:
+            jobs = None
         return dict(
             user_id=self.user_id,
             company_name=self.company_name,
+            jobs=jobs,
         )
+        
+    def as_dict_both(self):
+        return self.as_dict_down() | self.as_dict_up()

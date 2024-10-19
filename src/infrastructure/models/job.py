@@ -35,7 +35,7 @@ class Job(Base):
     
     owner = relationship("UserRecruiter", back_populates="jobs", uselist=False, lazy="immediate")
     
-    applications = relationship("Application", back_populates="applicant", lazy="raise")
+    applications = relationship("Application", back_populates="job", lazy="raise")
     
     def as_dict_up(self):
         return dict(
