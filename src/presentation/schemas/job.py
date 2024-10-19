@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, UUID4
 
 from src.application.job.enums import WorkType, EmploymentType
@@ -14,6 +16,7 @@ class JobResponse(BaseModel):
     work_type: WorkType
     employment_type: EmploymentType
     experience: str | None
+    created_at: datetime
     
 class JobWithRelevance(JobResponse):
     relevance: list[str] | None = None

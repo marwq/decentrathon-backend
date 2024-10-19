@@ -19,6 +19,7 @@ class User(Base):
     avatar_url: Mapped[str | None] = mapped_column(String(256))
     lang: Mapped[str] = mapped_column(String(2))
     role: Mapped[UserRole] = mapped_column(Enum(UserRole))
+    balance: Mapped[int] = mapped_column(BigInteger, default=0)
     
     applicant: Mapped[UserApplicant] = relationship("UserApplicant", back_populates="user", uselist=False, lazy="immediate")
     recruiter: Mapped[UserRecruiter] = relationship("UserRecruiter", back_populates="user", uselist=False, lazy="immediate")
@@ -31,6 +32,7 @@ class User(Base):
             avatar_url=self.avatar_url,
             lang=self.lang,
             role=self.role,
+            balance=self.balance,
         )
 
     def as_dict_down(self):
@@ -43,6 +45,7 @@ class User(Base):
             avatar_url=self.avatar_url,
             lang=self.lang,
             role=self.role,
+            balance=self.balance,
             applicant=applicant,
             recruiter=recruiter,
         )

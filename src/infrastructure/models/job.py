@@ -4,7 +4,7 @@ import uuid
 
 from sqlalchemy import (
     BigInteger, String, Enum, UUID, ForeignKey, DateTime, Text,
-    text as sqa_text
+    text as sqa_text, func
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -32,6 +32,7 @@ class Job(Base):
     work_type: Mapped[WorkType] = mapped_column(Enum(WorkType))
     employment_type: Mapped[EmploymentType] = mapped_column(Enum(EmploymentType))
     experience: Mapped[str | None] = mapped_column(String(256))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     
     owner = relationship("UserRecruiter", back_populates="jobs", uselist=False, lazy="immediate")
     
@@ -46,6 +47,7 @@ class Job(Base):
             salary_from=self.salary_from,
             salary_to=self.salary_to,
             experience=self.experience,
+            created_at=self.created_at,
             work_type=self.work_type,
             employment_type=self.employment_type,
             owner=self.owner.as_dict_up(),
@@ -64,6 +66,7 @@ class Job(Base):
             salary_from=self.salary_from,
             salary_to=self.salary_to,
             experience=self.experience,
+            created_at=self.created_at,
             work_type=self.work_type,
             employment_type=self.employment_type,
             applications=applications,
