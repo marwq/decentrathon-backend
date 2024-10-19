@@ -23,7 +23,7 @@ async def get_my_applications(
     async with uow:
         user_applicant = await uow.applicant_repo.get_with_applications(user_id)
         
-    return user_applicant.applications
+    return [i.as_dict_up() for i in user_applicant.applications]
 
 @router.post("/")
 async def add_new_application(
@@ -32,13 +32,16 @@ async def add_new_application(
     schema: NewApplicationSchema,
 ) -> ApplicationResponse:
     async with uow:
+        application = await uow.application_repo.get_by_filter(applicant_id=user_id, job_id=schema.job_id)
+        if application is not None:
+            raise HTTPException(400, "You have already submitted this job")
         application = Application(
             applicant_id=user_id,
             job_id=schema.job_id,
             caption=schema.caption,
         )
         uow.session.add(application)
-        uow.session.commit()
-        uow.session.refresh(application)
+        await uow.session.commit()
+        await uow.session.refresh(application)
             
-    return application
+    return application.as_dict_up()
