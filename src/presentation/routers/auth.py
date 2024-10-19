@@ -72,6 +72,9 @@ async def auth_tg_user(
                 web_app_ini_data.user.language_code,
                 schema.role
             )
+            await uow.applicant_repo.upsert_user_applicant(user.id, None, None, [], [])
+            await uow.recruiter_repo.upsert_user_recruiter(user.id, None)
+            await uow.session.commit()
     
     # create token
     access_token_expires = timedelta(days=settings.ACCESS_TOKEN_EXPIRE_DAYS)
@@ -81,7 +84,7 @@ async def auth_tg_user(
 
     return TelegramAuthResponse(
         access_token=access_token, 
-        user=user.as_dict()
+        user=user.as_dict_up()
     )
 
 

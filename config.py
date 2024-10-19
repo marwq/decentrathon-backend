@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     
     # TG
     TELEGRAM_BOT_TOKEN: str
+    
+    # Redis
+    REDIS_HOST: str
+    REDIS_PORT: str
+    REDIS_PASSWORD: str
 
 
 settings = Settings()

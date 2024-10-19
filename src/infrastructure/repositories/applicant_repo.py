@@ -1,7 +1,8 @@
 from datetime import date, datetime, timedelta
 from typing import Sequence
 
-from sqlalchemy import select, insert
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from src.infrastructure.models.applicant import UserApplicant, Experience, Skill
 from src.infrastructure.repositories.base import SQLAlchemyRepo
@@ -11,6 +12,18 @@ class ApplicantRepo(SQLAlchemyRepo[UserApplicant]):
     """User Applicant repository implementation for SQLAlchemy ORM."""
     
     model = UserApplicant
+    
+    async def get_with_applications(
+        self,
+        user_id: int
+    ) -> UserApplicant | None:
+        stmt = (
+            select(UserApplicant)
+            .options(joinedload(UserApplicant.applications))
+            .where(UserApplicant.user_id == user_id)
+        )
+        resp = await self._session.execute(stmt)
+        return resp.unique().scalar_one_or_none()
     
     async def upsert_user_applicant(
         self,
@@ -22,7 +35,7 @@ class ApplicantRepo(SQLAlchemyRepo[UserApplicant]):
     ) -> UserApplicant:
         stmt = select(UserApplicant).where(UserApplicant.user_id == user_id)
         result = await self._session.execute(stmt)
-        existing_applicant = result.scalar_one_or_none()
+        existing_applicant = result.unique().scalar_one_or_none()
         
         if existing_applicant:
             existing_applicant.job_title = job_title
@@ -64,9 +77,6 @@ class ApplicantRepo(SQLAlchemyRepo[UserApplicant]):
             for skill_data in skills_data
         ]
         existing_applicant.skills = new_skills
-        
-        await self._session.commit()
-        await self._session.refresh(existing_applicant)
         
         return existing_applicant
 

@@ -4,11 +4,21 @@ services:
   db:
     image: postgres
     restart: always
+    env_file:
+      - .docker.env
     environment:
-      POSTGRES_PASSWORD: somepassword
-      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ${DB_PASS}
     ports:
       - "5432:5432"
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    env_file:
+      - .docker.env
+    ports:
+      - "$REDIS_PORT:6379"
+    command: redis-server --port 6379 --save 20 1 --loglevel warning --requirepass $REDIS_PASSWORD
 
   web:
     build: .
@@ -19,5 +29,6 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
     env_file:
-      - .env
+      - .docker.env

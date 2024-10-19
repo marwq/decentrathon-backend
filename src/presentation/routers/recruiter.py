@@ -12,34 +12,39 @@ from loguru import logger
 
 from src.infrastructure.uow import SQLAlchemyUoW
 from src.presentation.di import get_uow, get_user_id
-from ..schemas.applicant import UserApplicantResponse, SetApplicantSchema
+from ..schemas.recruiter import UserRecruiterResposne, SetRecruiterSchema, RecruiterWithJobsResponse
 from config import settings
 
 
-router = APIRouter(prefix="/applicant", tags=["applicant"])
+router = APIRouter(prefix="/recruiter", tags=["recruiter"])
 
 @router.get("/me")
-async def get_my_applicant(
+async def get_my_recruiter(
     user_id: Annotated[int, Depends(get_user_id)],
     uow: Annotated[SQLAlchemyUoW, Depends(get_uow)],
-) -> UserApplicantResponse:
+) -> UserRecruiterResposne:
     async with uow:
         user = await uow.user_repo.get_item_by_id(user_id)
-    return user.applicant.as_dict_down()
+        recruiter = user.recruiter
+    return recruiter.as_dict_up()
 
 @router.post("/")
-async def set_my_applicant(
-    schema: SetApplicantSchema,
+async def set_my_recruiter(
+    schema: SetRecruiterSchema,
     user_id: Annotated[int, Depends(get_user_id)],
     uow: Annotated[SQLAlchemyUoW, Depends(get_uow)],
 ):
     async with uow:
-        await uow.applicant_repo.upsert_user_applicant(
+        await uow.recruiter_repo.upsert_user_recruiter(
             user_id, 
-            schema.job_title,
-            schema.job_salary,
-            experiences_data=[i.model_dump() for i in schema.experiences],
-            skills_data=[i.model_dump() for i in schema.skills],
+            schema.company_name
         )
         await uow.session.commit()
     return JSONResponse({"status": "ok"})
+
+@router.get("/jobs")
+async def get_my_jobs(
+    user_id: Annotated[int, Depends(get_user_id)],
+    uow: Annotated[SQLAlchemyUoW, Depends(get_uow)],
+) -> RecruiterWithJobsResponse:
+    ...

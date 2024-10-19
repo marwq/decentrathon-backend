@@ -11,3 +11,5 @@ loguru
 asyncpg
 psycopg2
 aiogram
+redis
+aioredis==2.0.1

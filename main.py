@@ -3,15 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 
 from src.presentation import register_routers
-# from src.presentation.utils import app_lifespan, lifespan_redis
+from src.presentation.utils import app_lifespan, lifespan_redis
 from config import settings
 
 
 app = FastAPI(
     root_path="/api",
-    # lifespan=app_lifespan(
-    #     lifespans=[lifespan_redis],
-    # ),
+    lifespan=app_lifespan(
+        lifespans=[lifespan_redis],
+    ),
 )
 
 app.add_middleware(

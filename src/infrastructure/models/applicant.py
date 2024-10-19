@@ -8,6 +8,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from .application import Application
 from .base import Base
 
 
@@ -19,17 +20,44 @@ class UserApplicant(Base):
     job_title: Mapped[str | None] = mapped_column(String(256))
     job_salary: Mapped[str | None] = mapped_column(String(256))
 
-    user = relationship("User", back_populates="applicant", uselist=False)
-    experiences: Mapped[list[Experience]] = relationship("Experience", back_populates="user_applicant", lazy="joined")
-    skills: Mapped[list[Skill]] = relationship("Skill", back_populates="user_applicant", lazy="joined")
+    user = relationship("User", back_populates="applicant", uselist=False, lazy="immediate")
+    experiences: Mapped[list[Experience]] = relationship("Experience", back_populates="user_applicant", lazy="immediate")
+    skills: Mapped[list[Skill]] = relationship("Skill", back_populates="user_applicant", lazy="immediate")
     
-    def as_dict(self):
+    applications: Mapped[list[Application]] = relationship("Application", back_populates="applicant", lazy="raise")
+    
+    def as_dict_up(self):
+        try:
+            user = self.user.as_dict_up()
+        except:
+            user = None
         return dict(
             user_id=self.user_id,
             job_title=self.job_title,
             job_salary=self.job_salary,
-            experiences=[i.as_dict() for i in self.experiences],
-            skills=[i.as_dict() for i in self.skills],
+            user=user,
+        )
+        
+    def as_dict_down(self):
+        try:
+            experiences = [i.as_dict_down() for i in self.experiences]
+        except:
+            experiences = None
+        try:
+            skills = [i.as_dict_down() for i in self.skills]
+        except:
+            skills = None
+        try:
+            applications = [i.as_dict_down() for i in self.applications]
+        except:
+            applications = None
+        return dict(
+            user_id=self.user_id,
+            job_title=self.job_title,
+            job_salary=self.job_salary,
+            experiences=experiences,
+            skills=skills,
+            applications=applications,
         )
 
 class Experience(Base):
@@ -51,9 +79,25 @@ class Experience(Base):
     description: Mapped[str | None] = mapped_column(Text)
     company_name: Mapped[str | None] = mapped_column(String(256))
     
-    user_applicant = relationship("UserApplicant", back_populates="experiences")
+    user_applicant = relationship("UserApplicant", back_populates="experiences", lazy="raise")
     
-    def as_dict(self):
+    def as_dict_up(self):
+        try:
+            user_applicant = self.user_applicant.as_dict_up()
+        except:
+            user_applicant = None
+        return dict(
+            id=self.id,
+            user_id=self.user_id,
+            title=self.title,
+            start_at=self.start_at,
+            end_at=self.end_at,
+            description=self.description,
+            company_name=self.company_name,
+            user_applicant=user_applicant,
+        )
+        
+    def as_dict_down(self):
         return dict(
             id=self.id,
             user_id=self.user_id,
@@ -79,9 +123,21 @@ class Skill(Base):
     )
     title: Mapped[str] = mapped_column(String(256))
     
-    user_applicant = relationship("UserApplicant", back_populates="skills")
+    user_applicant = relationship("UserApplicant", back_populates="skills", lazy="raise")
     
-    def as_dict(self):
+    def as_dict_up(self):
+        try:
+            user_applicant = self.user_applicant.as_dict_up()
+        except:
+            user_applicant = None
+        return dict(
+            id=self.id,
+            user_id=self.user_id,
+            title=self.title,
+            user_applicant=user_applicant, 
+        )
+        
+    def as_dict_down(self):
         return dict(
             id=self.id,
             user_id=self.user_id,

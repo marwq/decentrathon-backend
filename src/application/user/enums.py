@@ -2,5 +2,5 @@ import enum
 
 
 class UserRole(enum.Enum):
-    recruiter = "recruiter"
+    RECRUITER = "recruiter"
     APPLICANT = "applicant"

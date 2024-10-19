@@ -6,6 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from src.infrastructure.repositories import (
     UserRepo,
     ApplicantRepo,
+    RecruiterRepo,
+    JobRepo,
+    ApplicationRepo,
 )
 
 
@@ -25,6 +28,9 @@ class SQLAlchemyUoW:
 
     user_repo: UserRepo
     applicant_repo: ApplicantRepo
+    recruiter_repo: RecruiterRepo
+    job_repo: JobRepo
+    application_repo: ApplicationRepo
 
     def __init__(self, session_factory: async_sessionmaker[AsyncSession]) -> None:
         """
@@ -57,6 +63,9 @@ class SQLAlchemyUoW:
         self.session = self.session_factory()
         self.user_repo = UserRepo(self.session)
         self.applicant_repo = ApplicantRepo(self.session)
+        self.recruiter_repo = RecruiterRepo(self.session)
+        self.job_repo = JobRepo(self.session)
+        self.application_repo = ApplicationRepo(self.session)
         return self
 
     async def __aexit__(self, *args) -> None:
